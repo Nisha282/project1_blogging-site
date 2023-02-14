@@ -5,17 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "nodemon src/index.js"
   },
-  "author": "Divyanshu Patle, Nisha Sahu, Khomesh Gajbhiye, Nisit Solanki ",
+  "author": " Nisha Sahu ",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
-    "mongoose": "^6.6.0",
+    "mongoose": "^6.6.5",
     "nodemon": "^2.0.19"
   }
 }

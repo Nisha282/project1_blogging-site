@@ -1,16 +1,16 @@
 const authorModel = require("../models/authorModel");
 const jwt = require("jsonwebtoken");
 
-exports.login = async function (req, res) {
+const login = async function (req, res) {
   try {
     let checkEmailAndPassword = await authorModel.findOne({
       email: req.body.email,
       password: req.body.password,
     });
-    console.log(checkEmailAndPassword);
+    // console.log(checkEmailAndPassword);
     //Validating Email And PassWord(present/Not)
     if (!checkEmailAndPassword) {
-      return res.status(400).send({ msg: "Email and Password Are invalid" });
+      return res.status(400).send({ message: "Email and Password Are invalid" });
 
       //creating Token
     } else {
@@ -30,6 +30,8 @@ exports.login = async function (req, res) {
         .send({ data: Token, userId: checkEmailAndPassword._id });
     }
   } catch (err) {
-    res.status(500).send({ msg: "Server error HTTP 500" });
+    return res.status(500).send({ status: false, message: err.message })
   }
 };
+
+module.exports = {login}

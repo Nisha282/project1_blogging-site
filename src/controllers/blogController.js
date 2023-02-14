@@ -16,7 +16,7 @@ const isValid = function (value) {
 };
 
 //Create a blog document from request body. Get authorId in request body only
-exports.blogs = async function (req, res) {
+const blogs = async function (req, res) {
   try {
     let blogBody = req.body;
     blogBody.publishedAt = dateToday.format("YYYY-MM-DD");
@@ -24,38 +24,38 @@ exports.blogs = async function (req, res) {
 
     //Validating empty Doc
     if (Object.keys(blogBody).length == 0) {
-      return res.status(400).send({ status: false, msg: "data is required" });
+      return res.status(400).send({ status: false, message: "data is required" });
     }
 
     //Validating title (Madatory)
     if (!isValid(blogBody.title)) {
-      return res.status(400).send({ status: false, msg: "title is required" });
+      return res.status(400).send({ status: false, message: "title is required" });
     }
 
     //Validating body (Madatory)
     if (!isValid(blogBody.body)) {
-      return res.status(400).send({ status: false, msg: "body is required" });
+      return res.status(400).send({ status: false, message: "body is required" });
     }
 
     //Validating authorId (Madatory)
     if (!isValid(blogBody.authorId)) {
-      return res.status(400).send({ status: false, msg: "authorId is required" });
+      return res.status(400).send({ status: false, message: "authorId is required" });
     }
 
     //Validating tags (Madatory)
     if (!isValid(blogBody.tags)) {
-      return res.status(400).send({ status: false, msg: "tags is required" });
+      return res.status(400).send({ status: false, message: "tags is required" });
     }
 
     //Validating category (Madatory)
     if (!isValid(blogBody.category)) {
-      return res.status(400).send({ status: false, msg: "category is required" });
+      return res.status(400).send({ status: false, message: "category is required" });
     }
 
     //Checking authorId(present/Not)
     let checkAuthorId = await authorModel.findById(req.body.authorId);
     if (!checkAuthorId) {
-      return res.status(400).send({ status: false, msg: "Please Enter Valid AuthorId" });
+      return res.status(400).send({ status: false, message: "Please Enter Valid AuthorId" });
     }
 
     //all Working Fine (then else)
@@ -65,7 +65,7 @@ exports.blogs = async function (req, res) {
       return res.status(201).send({ status: true, data: blogData });
     }
   } catch (err) {
-    res.status(500).send({ status: false, ErrorName: err.name, ErrorMsg: err.message });
+    return res.status(500).send({ status: false, message: err.message })
   }
 };
 // ------------get blogs---------------
@@ -78,7 +78,7 @@ const getblogs = async function (req, res) {
     let category = req.query.category;
     let tags = req.query.tags;
     let subcategory = req.query.subcategory;
-    console.log(authorId);
+    // console.log(authorId);
     // applying filters
     //Returns all blogs in the collection that aren't deleted and are published
     if (authorId) {
@@ -96,36 +96,36 @@ const getblogs = async function (req, res) {
 
     let savedData = await blogModel.find(obj);
     if (savedData.length == 0) {
-      return res.status(404).send({ status: false, msg: "blogs not found" });
+      return res.status(404).send({ status: false, message: "blogs not found" });
     }
     return res.status(200).send({ status: true, data: savedData });
   } catch (err) {
-    return res.status(500).send({ status: false, msg: "Error", error: err.message });
+    return res.status(500).send({ status: false, message: err.message })
   }
 };
 
 // --------update blogs --------------
-exports.blogsUpdate = async function (req, res) {
+const blogsUpdate = async function (req, res) {
   try {
     //If param value is undefined
     let blogBody = req.body;
 
     //Validating Empty Document(Doc Present/Not)
     if (Object.keys(blogBody) == 0) {
-      return res.status(400).send({ status: false, msg: "Cant Update Empty document" });
+      return res.status(400).send({ status: false, message: "Cant Update Empty document" });
     }
 
     //Validating BlogId(Present/Not)
 
     let checkBlogId = await blogModel.findById(req.params.blogId);
     if (!checkBlogId) {
-      return res.status(400).send({ status: false, msg: "Blog Id is Invalid" });
+      return res.status(400).send({ status: false, message: "Blog Id is Invalid" });
     }
 
     //Allowing Only Whose Document Is Not Delected
 
     if (checkBlogId.isDeleted == true) {
-      return res.status(400).send({ status: false, msg: "This Document is Already Deleted" });
+      return res.status(400).send({ status: false, message: "This Document is Already Deleted" });
     }
 
     //All Validation Working
@@ -149,7 +149,7 @@ exports.blogsUpdate = async function (req, res) {
       return res.status(201).send({ status: true, data: blogUpdateData });
     }
   } catch (err) {
-    res.status(500).send({ status: false, msg: "HTTP 500 Server Error", ErrorName: err.name, ErrorMessage: err.message, });
+    return res.status(500).send({ status: false, message: err.message })
   }
 };
 
@@ -169,7 +169,7 @@ const deleteBlogById = async function (req, res) {
       return res.status(200).send({ status: true, status: 200 });
     }
   } catch (err) {
-    res.status(500).send({ status: false, ErrorName: err.name, ErrorMsg: err.message });
+    return res.status(500).send({ status: false, message: err.message })
   }
 };
 
@@ -192,7 +192,7 @@ const deleteblog = async function (req, res) {
     if (authorId) {
       obj.authorId = authorId; //if authorID (present) then  creating object(key ,value pair) inside obj
       if (tokenVerify.userId != authorId) {
-        return res.status(404).send({ status: false, msg: "wrong authorId" });
+        return res.status(404).send({ status: false, message: "wrong authorId" });
       }
     }
     if (category) {
@@ -211,13 +211,11 @@ const deleteblog = async function (req, res) {
     let savedData = await blogModel.updateMany(obj, { isDeleted: true });
 
     if (savedData.matchedCount == 0) {
-      return res.status(404).send({ status: false, msg: "the blog document doesn't exist" });
+      return res.status(404).send({ status: false, message: "the blog document doesn't exist" });
     }
     return res.status(200).send({ status: true, data: savedData });
-  } catch (error) {
-    return res.status(500).send({ status: false, error: error.message });
+  } catch (err) {
+    return res.status(500).send({ status: false, message: err.message })
   }
 };
-module.exports.getblogs = getblogs;
-module.exports.deleteBlogById = deleteBlogById;
-module.exports.deleteblog = deleteblog;
+module.exports = { blogs , getblogs , blogsUpdate , deleteBlogById , deleteblog}
